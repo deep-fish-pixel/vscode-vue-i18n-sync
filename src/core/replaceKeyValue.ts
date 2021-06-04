@@ -13,6 +13,7 @@ export default function(projectRoot: string, key: string, value: string) {
     const createPaths = key.replace(/\.[^.]+$/, '').split('.');
     const moduleExports = 'export default';
     let projectConfig: ProjectConfig = {
+        syncDirRoot: './src/locales',
         syncFileType: '.js',
         syncTabWidth: 2,
         syncQuotes: '\'',
@@ -41,7 +42,7 @@ export default function(projectRoot: string, key: string, value: string) {
                     });
                     if (!hasCurlyBrace) {
                         if (content.indexOf(moduleExports) === -1) {
-                            result += moduleExports; 
+                            result += moduleExports;
                         }
                         result = result + ` {\n${createKeyValue(key, value, projectConfig)}};`;
                     }
