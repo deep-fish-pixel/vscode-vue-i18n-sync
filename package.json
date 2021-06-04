@@ -3,7 +3,7 @@
 	"displayName": "vue-i18n-sync",
 	"description": "",
 	"version": "0.0.2",
-	"publisher": "120290590",
+	"publisher": "deepFish",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/maweimaweima/vscode-vue-i18n-sync.git"
@@ -37,11 +37,6 @@
 			"editor/context": [
 				{
 					"command": "extension.createVueI18nConfigCommand",
-					"group": "navigation",
-					"when": "editorHasSelection"
-				},
-				{
-					"command": "extension.changeVueI18nConfigCommand",
 					"group": "navigation",
 					"when": "editorHasSelection"
 				}

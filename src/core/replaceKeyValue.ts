@@ -14,6 +14,7 @@ export default function(projectRoot: string, key: string, value: string) {
     const moduleExports = 'export default';
     let projectConfig: ProjectConfig = {
         syncDirRoot: './src/locales',
+        syncDirs: [],
         syncFileType: '.js',
         syncTabWidth: 2,
         syncQuotes: '\'',
@@ -22,6 +23,7 @@ export default function(projectRoot: string, key: string, value: string) {
         Object.assign(projectConfig, config);
         const syncDirRoot: string  = config.syncDirRoot;
         const syncDirs: string[] = config.syncDirs;
+        checkAndCreateDirs(projectRoot, syncDirRoot, syncDirs);
         if (syncDirRoot) {
             return getSyncDirs(projectRoot, syncDirRoot);
         } else if(syncDirs) {
@@ -65,7 +67,6 @@ function getConfig(projectRoot: string) {
 
 function getSyncDirs(projectRoot: string, syncDirRoot: string) {
     return fse.readdir(path.join(projectRoot, syncDirRoot)).then(dirs => {
-        console.log(dirs);
         return dirs.map(dir => path.join(projectRoot, syncDirRoot, dir)).filter( dir => {
             return fse.statSync(dir).isDirectory();
         });
@@ -75,6 +76,26 @@ function getSyncDirs(projectRoot: string, syncDirRoot: string) {
 function createTabWith(count: number) {
     return new Array(count + 1).join(' ');
 }
+
+/**
+ * 生成键值对字符串
+ * @param key
+ * @param value
+ * @param syncTabWidth
+ * @param syncQuotes
+ */
 function createKeyValue(key: string, value: string, { syncTabWidth, syncQuotes }: ProjectConfig) {
     return `${createTabWith(syncTabWidth)}${syncQuotes}${key}${syncQuotes}: ${syncQuotes}${value}${syncQuotes}\n`;
+}
+
+/**
+ * 创建目录
+ * @param dirs
+ */
+function checkAndCreateDirs(projectRoot: string, syncDirRoot: string, dirs: string[]){
+    if (dirs) {
+        dirs.forEach(dir => {
+            fse.ensureDirSync(path.join(projectRoot, syncDirRoot, dir));
+        });
+    }
 }
