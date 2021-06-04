@@ -14,9 +14,11 @@ export function activate(context: vscode.ExtensionContext) {
 		const line: string = textEditor.document.lineAt(textEditor.selection.anchor).text; // 光标所在的行
 		const prevText = line.substring(0, anchor.character);
 		const tailText = line.substring(active.character);
-		const prevMatches = prevText.match(/(:?)([\w\-]+)\s*=\s*"$/);
-		if (prevMatches && tailText.match(/^"/)) {
-			const [all, direct, propertyName] = prevMatches;
+		const vuePropertyMatches = prevText.match(/(:?)([\w\-]+)\s*=\s*"$/);
+		const vueMethodMatches = prevText.match(/\(\s*(["'])$/);
+		// 替换vue属性国际化
+		if (vuePropertyMatches && tailText.match(/^"/)) {
+			const [all, direct, propertyName] = vuePropertyMatches;
 			// 替换起点位置
 			const start = new vscode.Position(anchor.line, prevText.substring(0, prevText.length - all.length).length);
 			// 替换终点位置
@@ -27,7 +29,19 @@ export function activate(context: vscode.ExtensionContext) {
 				editBuilder.replace(new vscode.Range(start, end), `${direct || ':'}${propertyName}="$t('${key}')`);
 				replaceKeyValue(getProjectRoot(), key, text);
 			});
-		} else {
+		} else if(vueMethodMatches) {// 替换vue方法参数的国际化
+			// 替换起点位置
+			const start = new vscode.Position(anchor.line, anchor.character - 1);
+			// 替换终点位置
+			const end = new vscode.Position(active.line, active.character + 1);
+			// 内容替换
+			textEditor.edit(editBuilder => {
+				const key = `${getVueI18Name()}.${Date.now()}`;
+				editBuilder.replace(new vscode.Range(start, end), `this.$t("${key}")`);
+				replaceKeyValue(getProjectRoot(), key, text);
+			});
+		}
+		else {// 其他国际化
 			// 替换起点位置
 			const start = new vscode.Position(anchor.line, anchor.character);
 			// 替换终点位置
